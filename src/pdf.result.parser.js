@@ -51,7 +51,6 @@ module.exports = async function pdfResultParser(filename) {
 
       pinyin += tmpPinyin;
       tmpCharacter = removeSpaces(tmpCharacter);
-      console.log({ tmpCharacter });
 
       ideograms += tmpCharacter;
       let pinyinIndex = 0;
