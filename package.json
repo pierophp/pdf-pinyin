@@ -1,0 +1,11 @@
+{
+  "name": "pdf-pinyin",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^7.0.1",
+    "prettier": "^1.15.3",
+    "replaceall": "^0.1.6"
+  }
+}
