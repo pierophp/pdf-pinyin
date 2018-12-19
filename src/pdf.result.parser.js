@@ -4,6 +4,41 @@ const replaceall = require('replaceall');
 const isChinese = require('./is.chinese');
 const separatePinyinInSyllables = require('./separate-pinyin-in-syllables');
 const removeSpaces = require('./remove.spaces');
+
+let map = {};
+let mapIndex = 0;
+
+async function parseCharacter(tmpCharacter, tmpPinyin) {
+  let pinyinIndex = 0;
+  let beginWord = true;
+
+  for (let charIndex = 0; charIndex <= tmpCharacter.length; charIndex += 1) {
+    const chineseVerification = isChinese(tmpCharacter[charIndex], true);
+
+    if (
+      chineseVerification.isChinese &&
+      chineseVerification.type === 'ideograms' &&
+      tmpPinyin
+    ) {
+      map[mapIndex] = {
+        char: tmpCharacter[charIndex],
+        pinyin: tmpPinyin[pinyinIndex],
+        isChinese: true,
+        beginWord,
+      };
+      pinyinIndex++;
+      beginWord = false;
+      mapIndex++;
+    } else if (tmpCharacter[charIndex] && tmpCharacter[charIndex].trim()) {
+      map[mapIndex] = {
+        char: tmpCharacter[charIndex],
+        isChinese: false,
+      };
+      mapIndex++;
+    }
+  }
+}
+
 module.exports = async function pdfResultParser(filename) {
   let pinyin = '';
   let ideograms = '';
@@ -11,10 +46,12 @@ module.exports = async function pdfResultParser(filename) {
   const content = (await readFile(filename)).toString();
   const lines = content.split('\n').filter(item => item);
 
+  map = {};
+  mapIndex = 0;
+
   let tmpPinyin;
   let tmpCharacter;
-  let map = {};
-  let mapIndex = 0;
+
   let lineIndex = 0;
   let totalLines = lines.length;
 
@@ -33,8 +70,14 @@ module.exports = async function pdfResultParser(filename) {
     const isChineseVerification = isChinese(line, true);
     if (isChineseVerification.isChinese) {
       if (isChineseVerification.type === 'special') {
+        await parseCharacter(line, null);
         ideograms += removeSpaces(line);
         continue;
+      }
+
+      if (tmpCharacter) {
+        await parseCharacter(tmpCharacter, null);
+        ideograms += tmpCharacter;
       }
 
       tmpCharacter = line;
@@ -53,41 +96,14 @@ module.exports = async function pdfResultParser(filename) {
       tmpCharacter = removeSpaces(tmpCharacter);
 
       ideograms += tmpCharacter;
-      let pinyinIndex = 0;
-      let beginWord = true;
 
       if (!tmpCharacter) {
         continue;
       }
 
-      for (
-        let charIndex = 0;
-        charIndex <= tmpCharacter.length;
-        charIndex += 1
-      ) {
-        const chineseVerification = isChinese(tmpCharacter[charIndex], true);
+      await parseCharacter(tmpCharacter, tmpPinyin);
 
-        if (
-          chineseVerification.isChinese &&
-          chineseVerification.type === 'ideograms'
-        ) {
-          map[mapIndex] = {
-            char: tmpCharacter[charIndex],
-            pinyin: tmpPinyin[pinyinIndex],
-            isChinese: true,
-            beginWord,
-          };
-          pinyinIndex++;
-          beginWord = false;
-          mapIndex++;
-        } else if (tmpCharacter[charIndex] && tmpCharacter[charIndex].trim()) {
-          map[mapIndex] = {
-            char: tmpCharacter[charIndex],
-            isChinese: false,
-          };
-          mapIndex++;
-        }
-      }
+      tmpCharacter = null;
     }
   }
 

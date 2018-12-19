@@ -42,8 +42,10 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
 
           await importPinyin(pdfResultParsed.line, indexOf);
 
+          indexOf = -1;
+
           if (notFoundYet) {
-            line = notFoundYet;
+            line = notFoundYet.trim();
             notFoundYet = '';
           } else {
             whileContinue = false;
