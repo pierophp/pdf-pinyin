@@ -1,5 +1,4 @@
 // @ts-check
-const { readFile } = require('fs-extra');
 const replaceall = require('replaceall');
 const isChinese = require('./is.chinese');
 const separatePinyinInSyllables = require('./separate-pinyin-in-syllables');
@@ -53,7 +52,6 @@ async function parseCharacter(tmpCharacter, tmpPinyin) {
 }
 
 module.exports = async function pdfResultParser(content) {
-  let pinyin = '';
   let ideograms = '';
 
   const lines = content.split('\n').filter(item => item);
@@ -64,16 +62,7 @@ module.exports = async function pdfResultParser(content) {
   let tmpPinyin;
   let tmpCharacter;
 
-  let lineIndex = 0;
-  let totalLines = lines.length;
-
   for (let line of lines) {
-    lineIndex++;
-
-    if (lineIndex % 10 === 0) {
-      console.log(`${lineIndex}/${totalLines}`);
-    }
-
     // \f is new page
     line = replaceall('\f', '', line);
     line = replaceall('_', '', line);
@@ -105,8 +94,6 @@ module.exports = async function pdfResultParser(content) {
       }
 
       tmpPinyin = separatePinyinInSyllables(tmpPinyin, false);
-
-      pinyin += tmpPinyin;
       tmpCharacter = removeSpaces(tmpCharacter);
 
       if (!tmpCharacter) {
@@ -121,7 +108,6 @@ module.exports = async function pdfResultParser(content) {
   }
 
   return {
-    // pinyin,
     ideograms,
     map,
   };
