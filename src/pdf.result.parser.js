@@ -11,8 +11,9 @@ let mapIndex = 0;
 async function parseCharacter(tmpCharacter, tmpPinyin) {
   let pinyinIndex = 0;
   let beginWord = true;
+  let currentType = '';
 
-  for (let charIndex = 0; charIndex <= tmpCharacter.length; charIndex += 1) {
+  for (let charIndex = 0; charIndex < tmpCharacter.length; charIndex += 1) {
     const chineseVerification = isChinese(tmpCharacter[charIndex], true);
 
     if (
@@ -20,6 +21,10 @@ async function parseCharacter(tmpCharacter, tmpPinyin) {
       chineseVerification.type === 'ideograms' &&
       tmpPinyin
     ) {
+      if (currentType !== 'ideograms') {
+        beginWord = true;
+      }
+
       map[mapIndex] = {
         char: tmpCharacter[charIndex],
         pinyin: tmpPinyin[pinyinIndex],
@@ -29,21 +34,28 @@ async function parseCharacter(tmpCharacter, tmpPinyin) {
       pinyinIndex++;
       beginWord = false;
       mapIndex++;
+      currentType = 'ideograms';
     } else if (tmpCharacter[charIndex] && tmpCharacter[charIndex].trim()) {
+      if (currentType !== 'special') {
+        beginWord = true;
+      }
+
       map[mapIndex] = {
         char: tmpCharacter[charIndex],
         isChinese: false,
+        beginWord,
       };
+      beginWord = false;
       mapIndex++;
+      currentType = 'special';
     }
   }
 }
 
-module.exports = async function pdfResultParser(filename) {
+module.exports = async function pdfResultParser(content) {
   let pinyin = '';
   let ideograms = '';
 
-  const content = (await readFile(filename)).toString();
   const lines = content.split('\n').filter(item => item);
 
   map = {};
@@ -70,12 +82,14 @@ module.exports = async function pdfResultParser(filename) {
     const isChineseVerification = isChinese(line, true);
     if (isChineseVerification.isChinese) {
       if (isChineseVerification.type === 'special') {
+        line = removeSpaces(line);
         await parseCharacter(line, null);
-        ideograms += removeSpaces(line);
+        ideograms += line;
         continue;
       }
 
       if (tmpCharacter) {
+        tmpCharacter = removeSpaces(tmpCharacter);
         await parseCharacter(tmpCharacter, null);
         ideograms += tmpCharacter;
       }
@@ -95,17 +109,20 @@ module.exports = async function pdfResultParser(filename) {
       pinyin += tmpPinyin;
       tmpCharacter = removeSpaces(tmpCharacter);
 
-      ideograms += tmpCharacter;
-
       if (!tmpCharacter) {
         continue;
       }
 
       await parseCharacter(tmpCharacter, tmpPinyin);
+      ideograms += tmpCharacter;
 
       tmpCharacter = null;
     }
   }
 
-  return { pinyin, ideograms, map };
+  return {
+    // pinyin,
+    ideograms,
+    map,
+  };
 };

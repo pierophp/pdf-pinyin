@@ -14,7 +14,7 @@ test('Pinyin', () => {
 
 test('Ideograms + Special (NOT REMOVE SPECIAL)', () => {
   const isChineseResult = isChinese('。 （ 申命记');
-  expect(isChineseResult.isChinese).toBe(false);
+  expect(isChineseResult.isChinese).toBe(true);
 });
 
 test('Ideograms + Special (REMOVE SPECIAL)', () => {

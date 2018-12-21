@@ -55,8 +55,8 @@ module.exports = function isChinese(originalStr, removeSpecials) {
       }
     }
 
-    if (!flag) {
-      return { isChinese: false };
+    if (flag) {
+      return { isChinese: true, type: 'ideograms' };
     }
 
     if (charCode <= 0xffff) {
