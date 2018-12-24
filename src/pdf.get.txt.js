@@ -1,7 +1,11 @@
 // @ts-check
-const { stat, mkdir } = require('fs-extra');
+const { stat, mkdir, writeFile } = require('fs-extra');
+const axios = require('axios');
 
-async function createFolder(folder) {
+const { exec } = require('child-process-async');
+
+async function createParentFolder() {
+  const folder = `${__dirname}/../data`;
   try {
     await stat(folder);
   } catch (e) {
@@ -9,11 +13,33 @@ async function createFolder(folder) {
   }
 }
 
-module.exports = async function pdfGetTxt(file) {
-  let folder = `${__dirname}/../data`;
-  await createFolder(folder);
+async function downloadFile(fullFilename, filename) {
+  try {
+    await stat(filename);
+  } catch (e) {
+    if (fullFilename.indexOf('://') !== -1) {
+      const result = await axios.request({
+        responseType: 'arraybuffer',
+        url: fullFilename,
+        method: 'get',
+      });
 
-  if (file.indexOf('://') !== -1) {
-    console.log('HTTP');
+      await writeFile(filename, result.data);
+    }
   }
+}
+
+async function extractFile(filename, filenameTxt) {
+  try {
+    await stat(filenameTxt);
+  } catch (e) {
+    const child = await exec(`pdftotext -raw ${filename} ${filenameTxt}`, {});
+    await child;
+  }
+}
+
+module.exports = async function pdfGetTxt(fullFilename, filename, filenameTxt) {
+  await createParentFolder();
+  await downloadFile(fullFilename, filename);
+  await extractFile(filename, filenameTxt);
 };

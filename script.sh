@@ -1,1 +1,0 @@
-pdftotext -raw w_f-lp_e-Pi_CHS_201809.pdf w_f-lp_e-Pi_CHS_201809.pdf.txt

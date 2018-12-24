@@ -80,5 +80,5 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
     returnLines.push(returnLine);
   }
 
-  console.log(JSON.stringify(returnLines, null, 2));
+  return returnLines;
 };
