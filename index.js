@@ -9,9 +9,9 @@ const { stat, writeFile, readFile } = require('fs-extra');
   const fullFilenameSplit = fullFilename.split('/');
   const filenameRelative = fullFilenameSplit[fullFilenameSplit.length - 1];
 
-  const filename = `data/${filenameRelative}`;
-  const filenameToConvert = `data/${process.argv[3]}`;
-  const filenameToReturn = `data/result.${process.argv[3]}.json`;
+  const filename = `${__dirname}/data/${filenameRelative}`;
+  const filenameToConvert = `${__dirname}/data/${process.argv[3]}`;
+  const filenameToReturn = `${__dirname}/data/result.${process.argv[3]}.json`;
   const filenameTxt = `${filename}.txt`;
   const filenameParsed = `${filename}.parsed.json`;
 
