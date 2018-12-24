@@ -1,33 +1,50 @@
 // @ts-check
 const removeSpaces = require('./remove.spaces');
 
-async function importPinyin(pdfResultParsed, line, indexOf) {
+async function importPinyin(pdfResultParsed, line, indexOf, isFounded) {
   let index = indexOf;
 
   const result = [];
   let resultItem = -1;
   for (let lineIndex = 0; lineIndex < line.length; lineIndex++) {
-    const mapItem = pdfResultParsed.map[index];
+    if (isFounded) {
+      const mapItem = pdfResultParsed.map[index];
 
-    if (mapItem.beginWord) {
+      if (mapItem.beginWord) {
+        resultItem++;
+      }
+
+      if (resultItem < 0) {
+        resultItem = 0;
+      }
+
+      if (!result[resultItem]) {
+        result[resultItem] = {};
+        result[resultItem].c = [];
+        result[resultItem].p = [];
+      }
+      result[resultItem].c.push(mapItem.char);
+      result[resultItem].p.push(mapItem.pinyin ? mapItem.pinyin : '');
+    } else {
       resultItem++;
-    }
 
-    if (resultItem < 0) {
-      resultItem = 0;
-    }
+      if (resultItem < 0) {
+        resultItem = 0;
+      }
 
-    if (!result[resultItem]) {
-      result[resultItem] = {};
-      result[resultItem].c = [];
-      result[resultItem].p = [];
+      if (!result[resultItem]) {
+        result[resultItem] = {};
+        result[resultItem].c = [];
+        result[resultItem].p = [];
+      }
+
+      result[resultItem].c.push(line[lineIndex]);
+      result[resultItem].p.push('');
+      result[resultItem].notFound = true;
     }
-    result[resultItem].c.push(mapItem.char);
-    result[resultItem].p.push(mapItem.pinyin ? mapItem.pinyin : '');
 
     index++;
   }
-
   return result;
 }
 
@@ -55,9 +72,9 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
       indexOf = pdfResultParsed.ideograms.indexOf(line);
 
       if (indexOf >= 0) {
-        const pinyinResult = await importPinyin(pdfResultParsed, line, indexOf);
-
-        returnLine = returnLine.concat(pinyinResult);
+        returnLine = returnLine.concat(
+          await importPinyin(pdfResultParsed, line, indexOf, true),
+        );
 
         indexOf = -1;
 
@@ -72,7 +89,21 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
         line = line.substr(0, line.length - 1);
 
         if (!line) {
-          whileContinue = false;
+          if (notFoundYet) {
+            returnLine = returnLine.concat(
+              await importPinyin(
+                pdfResultParsed,
+                notFoundYet.substr(0, 1),
+                indexOf,
+                false,
+              ),
+            );
+
+            line = notFoundYet.substr(1);
+            notFoundYet = '';
+          } else {
+            whileContinue = false;
+          }
         }
       }
     }
