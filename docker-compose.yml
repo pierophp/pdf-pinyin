@@ -1,0 +1,12 @@
+version: '2'
+services:
+  pdf_pinyin:
+    container_name: pdf_pinyin
+    build: ./
+    user: "node"
+    working_dir: /home/node/pdf-pinyin/
+    environment:
+      NODE_ENV: 'development'
+    volumes:
+      - ./:/home/node/pdf-pinyin:cached
+    command: "yarn dev"
