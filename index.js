@@ -1,13 +1,17 @@
 // @ts-check
-
+const pdfGetText = require('./src/pdf.get.txt');
 const pdfResultParser = require('./src/pdf.result.parser.js');
 const pinyinParser = require('./src/pinyin.parser');
 const { stat, writeFile, readFile } = require('fs-extra');
-let filename = 'data/w_f-lp_e-Pi_CHS_201809.pdf';
-const filenameTxt = `${filename}.txt`;
-const filenameParsed = `${filename}.parsed.json`;
 
 (async function init() {
+  let filename = 'data/w_f-lp_e-Pi_CHS_201809.pdf';
+  const filenameTxt = `${filename}.txt`;
+  const filenameParsed = `${filename}.parsed.json`;
+
+  await pdfGetText(filename);
+  return;
+
   let resultString = '';
   try {
     // throw new Error('Disable cache');
