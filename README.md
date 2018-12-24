@@ -10,6 +10,8 @@ Using docker all you need to do is run:
 docker-compose build
 ```
 
+If you don't want to use Docker please see: [README-NO-DOCKER.md](README-NO-DOCKER.md).
+
 ## Usage
 
 You can pass a URL with the PDF:
