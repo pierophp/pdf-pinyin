@@ -13,18 +13,18 @@ test('Pinyin', () => {
 });
 
 test('Ideograms + Special (NOT REMOVE SPECIAL)', () => {
-  const isChineseResult = isChinese('。 （ 申命记');
+  const isChineseResult = isChinese('。 （ 我們');
   expect(isChineseResult.isChinese).toBe(true);
 });
 
 test('Ideograms + Special (REMOVE SPECIAL)', () => {
-  const isChineseResult = isChinese('。 （ 申命记', true);
+  const isChineseResult = isChinese('。 （ 我們', true);
   expect(isChineseResult.isChinese).toBe(true);
   expect(isChineseResult.type).toBe('ideograms');
 });
 
 test('Special (REMOVE SPECIAL)', () => {
-  const isChineseResult = isChinese('3:12,13）', true);
+  const isChineseResult = isChinese('3，12,13）', true);
   expect(isChineseResult.isChinese).toBe(true);
   expect(isChineseResult.type).toBe('special');
 });
