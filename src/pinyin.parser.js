@@ -1,5 +1,6 @@
 // @ts-check
 const removeSpaces = require('./remove.spaces');
+const replaceall = require('replaceall');
 
 async function importPinyin(pdfResultParsed, line, indexOf, isFounded) {
   let index = indexOf;
@@ -50,8 +51,23 @@ async function importPinyin(pdfResultParsed, line, indexOf, isFounded) {
 
 module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
   const returnLines = [];
-  for (let line of lines) {
+  for (const originalLine of lines) {
     let returnLine = [];
+    let line = originalLine;
+
+    let hasBold = false;
+    if (line.indexOf('<b>') !== -1) {
+      hasBold = true;
+      line = replaceall('<b>', '', line);
+      line = replaceall('</b>', '', line);
+    }
+
+    let hasItalic = false;
+    if (line.indexOf('<i>') !== -1) {
+      hasItalic = true;
+      line = replaceall('<i>', '', line);
+      line = replaceall('</i>', '', line);
+    }
 
     line = removeSpaces(line);
 
@@ -103,6 +119,51 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
             notFoundYet = '';
           } else {
             whileContinue = false;
+          }
+        }
+      }
+    }
+
+    let elementIndex = -1;
+
+    if (hasBold || hasItalic) {
+      let isBold = false;
+      let isItalic = false;
+      for (const item of returnLine) {
+        for (const character of item.c) {
+          elementIndex++;
+
+          if (originalLine[elementIndex] === character) {
+            if (isBold) {
+              item.isBold = true;
+            }
+
+            if (isItalic) {
+              item.isItalic = true;
+            }
+            continue;
+          }
+
+          if (originalLine.substr(elementIndex, 3) === '<b>') {
+            isBold = true;
+            item.isBold = true;
+            elementIndex += 3;
+          }
+
+          if (originalLine.substr(elementIndex, 4) === '</b>') {
+            isBold = false;
+            elementIndex += 4;
+          }
+
+          if (originalLine.substr(elementIndex, 3) === '<i>') {
+            isItalic = true;
+            item.isItalic = true;
+            elementIndex += 3;
+          }
+
+          if (originalLine.substr(elementIndex, 4) === '</i>') {
+            isItalic = false;
+            elementIndex += 4;
           }
         }
       }
