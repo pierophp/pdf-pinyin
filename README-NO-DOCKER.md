@@ -4,10 +4,34 @@ The project goal is to extract the Pinyin from a PDF.
 
 ## Dependencies
 
-Using docker all you need to do is run:
+### pdftotext
+
+To install in a Linux environment:
+
+Debian / Ubuntu:
 
 ```
-docker-compose build
+sudo apt-get install poppler-utils
+```
+
+Fedora / CentOS:
+
+```
+yum install poppler-utils
+```
+
+### Node Modules
+
+YARN:
+
+```
+yarn install
+```
+
+NPM:
+
+```
+npm install
 ```
 
 ## Usage
@@ -15,13 +39,13 @@ docker-compose build
 You can pass a URL with the PDF:
 
 ```
-docker-compose run --rm pdf_pinyin ./run.sh http://mywebsite.com/myfile.pdf convert.txt
+node index.js http://mywebsite.com/myfile.pdf convert.txt
 ```
 
 Or you can save a file in the folder "data" and pass the filename
 
 ```
-docker-compose run --rm pdf_pinyin ./run.sh myfile.pdf convert.txt
+node index.js myfile.pdf convert.txt
 ```
 
 You need to pass as a second paramenter the filename with the content to convert (needs to be previous saved in the folder "data").
