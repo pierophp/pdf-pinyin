@@ -38,7 +38,7 @@ async function extractFile(filename, filenameTxt) {
   }
 }
 
-module.exports = async function pdfGetTxt(fullFilename, filename, filenameTxt) {
+module.exports = async function pdfToTxt(fullFilename, filename, filenameTxt) {
   await createParentFolder();
   await downloadFile(fullFilename, filename);
   await extractFile(filename, filenameTxt);

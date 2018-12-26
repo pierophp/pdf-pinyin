@@ -1,7 +1,9 @@
 // @ts-check
 const replaceall = require('replaceall');
 let specialChars = require('./special-ideograms-chars');
+
 const numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
 specialChars = specialChars.concat(numbers, [' ']);
 
 const chineseRange = [

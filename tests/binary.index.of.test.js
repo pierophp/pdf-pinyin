@@ -1,5 +1,5 @@
 // @ts-check
-const binaryIndexOf = require('../src/binary.index.of');
+const binaryIndexOf = require('../src/helpers/binary.index.of');
 
 test('Full', () => {
   const text = 'Testofsearch';

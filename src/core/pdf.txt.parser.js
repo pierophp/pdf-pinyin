@@ -1,9 +1,9 @@
 // @ts-check
 const replaceall = require('replaceall');
-const isChinese = require('./is.chinese');
-const normalizeSearch = require('./normalize.search');
-const removeSpaces = require('./remove.spaces');
-const separatePinyinInSyllables = require('./separate-pinyin-in-syllables');
+const isChinese = require('../helpers/is.chinese');
+const normalizeSearch = require('../helpers/normalize.search');
+const removeSpaces = require('../helpers/remove.spaces');
+const separatePinyinInSyllables = require('../helpers/separate-pinyin-in-syllables');
 
 let map = {};
 let mapIndex = 0;
@@ -52,7 +52,7 @@ async function parseCharacter(tmpCharacter, tmpPinyin) {
   }
 }
 
-module.exports = async function pdfResultParser(content) {
+module.exports = async function pdfTxtParser(content) {
   let ideograms = '';
 
   const lines = content.split('\n').filter(item => item);

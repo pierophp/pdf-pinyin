@@ -1,5 +1,5 @@
 // @ts-check
-const isChinese = require('../src/is.chinese');
+const isChinese = require('../src/helpers/is.chinese');
 
 test('Ideograms', () => {
   const isChineseResult = isChinese('理由');

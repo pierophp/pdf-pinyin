@@ -1,9 +1,9 @@
 // @ts-check
 const { appendFile } = require('fs-extra');
 const replaceall = require('replaceall');
-const normalizeSearch = require('./normalize.search');
-const removeSpaces = require('./remove.spaces');
-const binaryIndexOf = require('./binary.index.of');
+const normalizeSearch = require('../helpers/normalize.search');
+const removeSpaces = require('../helpers/remove.spaces');
+const binaryIndexOf = require('../helpers/binary.index.of');
 
 async function importPinyin(pdfResultParsed, line, indexOf, isFounded) {
   let index = indexOf;
