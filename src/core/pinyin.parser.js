@@ -3,123 +3,10 @@ const { appendFile } = require('fs-extra');
 const replaceall = require('replaceall');
 const normalizeSearch = require('../helpers/normalize.search');
 const removeSpaces = require('../helpers/remove.spaces');
+const debug = require('../helpers/debug');
 const binaryIndexOf = require('../helpers/binary.index.of');
-
-async function importPinyin(pdfResultParsed, line, indexOf, isFounded) {
-  let index = indexOf;
-
-  const result = [];
-  let resultItem = -1;
-  for (let lineIndex = 0; lineIndex < line.length; lineIndex++) {
-    if (line.substr(lineIndex, 1) === '*') {
-      resultItem++;
-
-      if (!result[resultItem]) {
-        result[resultItem] = {};
-        result[resultItem].c = [];
-        result[resultItem].p = [];
-      }
-
-      result[resultItem].c.push(line[lineIndex]);
-      result[resultItem].p.push(' ');
-      result[resultItem].notFound = true;
-
-      continue;
-    }
-
-    if (isFounded) {
-      const mapItem = pdfResultParsed.map[index];
-
-      if (mapItem.beginWord) {
-        resultItem++;
-      }
-
-      if (resultItem < 0) {
-        resultItem = 0;
-      }
-
-      if (!result[resultItem]) {
-        result[resultItem] = {};
-        result[resultItem].c = [];
-        result[resultItem].p = [];
-      }
-      result[resultItem].c.push(mapItem.char);
-      result[resultItem].p.push(mapItem.pinyin ? mapItem.pinyin : ' ');
-
-      index++;
-
-      continue;
-    }
-
-    resultItem++;
-
-    if (!result[resultItem]) {
-      result[resultItem] = {};
-      result[resultItem].c = [];
-      result[resultItem].p = [];
-    }
-
-    result[resultItem].c.push(line[lineIndex]);
-    result[resultItem].p.push(' ');
-    result[resultItem].notFound = true;
-
-    index++;
-  }
-
-  return result;
-}
-
-function fillBoldItalic(originalLine, returnLine) {
-  let elementIndex = -1;
-  let isBold = false;
-  let isItalic = false;
-  for (const item of returnLine) {
-    for (const character of item.c) {
-      elementIndex++;
-
-      if (originalLine[elementIndex] === character) {
-        if (isBold) {
-          item.isBold = true;
-        }
-
-        if (isItalic) {
-          item.isItalic = true;
-        }
-        continue;
-      }
-
-      if (originalLine.substr(elementIndex, 3) === '<b>') {
-        isBold = true;
-        item.isBold = true;
-        elementIndex += 3;
-      }
-
-      if (originalLine.substr(elementIndex, 4) === '</b>') {
-        isBold = false;
-        elementIndex += 4;
-      }
-
-      if (originalLine.substr(elementIndex, 3) === '<i>') {
-        isItalic = true;
-        item.isItalic = true;
-        elementIndex += 3;
-      }
-
-      if (originalLine.substr(elementIndex, 4) === '</i>') {
-        isItalic = false;
-        elementIndex += 4;
-      }
-    }
-  }
-
-  return returnLine;
-}
-
-function debug(message) {
-  if (process.env.DEBUG_LOG) {
-    appendFile(`${__dirname}/../data/log.txt`, `${message}\n`).then();
-  }
-}
+const importPinyin = require('./pinyin/import.pinyin');
+const fillBoldItalic = require('./pinyin/fill.bold.italic');
 
 module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
   const returnLines = [];
@@ -171,7 +58,7 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
         whileContinue = false;
       }
 
-      const binaryIndexOfResult = binaryIndexOf(
+      const binaryIndexOfResult = await binaryIndexOf(
         pdfResultParsed.ideograms,
         lineSearch,
         hasAsterisk,

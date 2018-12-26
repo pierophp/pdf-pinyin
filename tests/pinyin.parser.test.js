@@ -1,5 +1,5 @@
 // @ts-check
-const pinyinParser = require('../src/pinyin.parser');
+const pinyinParser = require('../src/core/pinyin.parser');
 
 test('Pinyin Parser ', async () => {
   const resultParser = {

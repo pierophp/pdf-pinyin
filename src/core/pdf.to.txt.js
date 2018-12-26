@@ -5,7 +5,7 @@ const axios = require('axios');
 const { exec } = require('child-process-async');
 
 async function createParentFolder() {
-  const folder = `${__dirname}/../data`;
+  const folder = `${__dirname}/../../data`;
   try {
     await stat(folder);
   } catch (e) {

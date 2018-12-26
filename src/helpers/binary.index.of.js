@@ -5,7 +5,12 @@ function cleanSearch(search) {
   return search;
 }
 
-function binaryPartialSearch(text, search, lengthToSearch, partialSearchLevel) {
+async function binaryPartialSearch(
+  text,
+  search,
+  lengthToSearch,
+  partialSearchLevel,
+) {
   partialSearchLevel++;
   let partialSearch = search.substr(0, lengthToSearch);
   let indexOf = text.indexOf(partialSearch);
@@ -24,7 +29,7 @@ function binaryPartialSearch(text, search, lengthToSearch, partialSearchLevel) {
       return { indexOf, length: newLengthToSearch, partialSearchLevel };
     }
 
-    return binaryPartialSearch(
+    return await binaryPartialSearch(
       text,
       search,
       newLengthToSearch + 1,
@@ -36,7 +41,7 @@ function binaryPartialSearch(text, search, lengthToSearch, partialSearchLevel) {
     return { indexOf: -1, length: 0, partialSearchLevel };
   }
 
-  return binaryPartialSearch(
+  return await binaryPartialSearch(
     text,
     search,
     Math.ceil(lengthToSearch / 2),
@@ -44,7 +49,7 @@ function binaryPartialSearch(text, search, lengthToSearch, partialSearchLevel) {
   );
 }
 
-module.exports = function binaryIndexOf(text, search, needsCleanSearch) {
+module.exports = async function binaryIndexOf(text, search, needsCleanSearch) {
   // full search
   let cleanedSearch = search;
   if (needsCleanSearch) {
@@ -53,7 +58,7 @@ module.exports = function binaryIndexOf(text, search, needsCleanSearch) {
   let indexOf = text.indexOf(cleanedSearch);
   if (indexOf === -1) {
     const lengthToSearch = Math.ceil(search.length / 2);
-    return binaryPartialSearch(text, search, lengthToSearch, 0);
+    return await binaryPartialSearch(text, search, lengthToSearch, 0);
   }
 
   return { indexOf, length: search.length, partialSearchLevel: 0 };
