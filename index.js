@@ -4,34 +4,8 @@ const pdfResultParser = require('./src/pdf.result.parser.js');
 const pinyinParser = require('./src/pinyin.parser');
 const { stat, writeFile, readFile, remove } = require('fs-extra');
 
-/**
- * @todo Improve Lock
- */
-async function verifyLock(lockFile) {
-  let loop = 0;
-  try {
-    while (1) {
-      await stat(lockFile);
-
-      console.log('Awaiting Lock');
-
-      await new Promise(resolve => {
-        setTimeout(resolve, 1000);
-      });
-
-      loop++;
-    }
-  } catch (e) {
-    if (loop === 0) {
-      return false;
-    }
-
-    return true;
-  }
-}
-
 (async function init() {
-  process.env.DEBUG_LOG = '0';
+  process.env.DEBUG_LOG = '1';
 
   const fullFilename = process.argv[2];
   const fullFilenameSplit = fullFilename.split('/');
@@ -79,3 +53,29 @@ async function verifyLock(lockFile) {
 
   await writeFile(filenameToReturn, JSON.stringify(returnLines, null, 2));
 })();
+
+/**
+ * @todo Improve Lock
+ */
+async function verifyLock(lockFile) {
+  let loop = 0;
+  try {
+    while (1) {
+      await stat(lockFile);
+
+      console.log('Awaiting Lock');
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 1000);
+      });
+
+      loop++;
+    }
+  } catch (e) {
+    if (loop === 0) {
+      return false;
+    }
+
+    return true;
+  }
+}

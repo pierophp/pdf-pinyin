@@ -142,9 +142,8 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
     }
 
     line = removeSpaces(line);
-    let lineSearch = await normalizeSearch(line);
 
-    let indexOf = -1;
+    let lineSearch = await normalizeSearch(line);
 
     let whileContinue = true;
 
@@ -155,7 +154,7 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
     const regexResult = line.match(regexFootnote);
     if (regexResult) {
       returnLine = returnLine.concat(
-        await importPinyin(pdfResultParsed, regexResult[0], indexOf, false),
+        await importPinyin(pdfResultParsed, regexResult[0], -1, false),
       );
 
       line = line.substr(regexResult[0].length);
@@ -195,16 +194,22 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
           whileContinue = false;
         }
 
-        if (numberOfLoops > 1) {
+        if (binaryIndexOfResult.partialSearchLevel > 1) {
           debug(
-            `FOUND AT ${numberOfLoops} - ${line} ORIGINAL: ${originalLine}`,
+            `LEVEL ${
+              binaryIndexOfResult.partialSearchLevel
+            } LOOP ${numberOfLoops} - ${foundLine} ORIGINAL: ${originalLine}`,
           );
         }
       } else {
         returnLine = returnLine.concat(
           await importPinyin(pdfResultParsed, line.substr(0, 1), -1, false),
         );
-        debug(`NOT FOUND AT ${numberOfLoops} - ${line}`);
+        debug(
+          `NOT FOUND LEVEL ${
+            binaryIndexOfResult.partialSearchLevel
+          } LOOP ${numberOfLoops} - ${line}`,
+        );
         line = line.substr(0, line.length - 1);
         if (!line) {
           whileContinue = false;

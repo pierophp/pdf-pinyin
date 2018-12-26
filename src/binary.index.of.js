@@ -5,7 +5,8 @@ function cleanSearch(search) {
   return search;
 }
 
-function binaryPartialSearch(text, search, lengthToSearch) {
+function binaryPartialSearch(text, search, lengthToSearch, partialSearchLevel) {
+  partialSearchLevel++;
   let partialSearch = search.substr(0, lengthToSearch);
   let indexOf = text.indexOf(partialSearch);
   if (indexOf >= 0) {
@@ -20,17 +21,27 @@ function binaryPartialSearch(text, search, lengthToSearch) {
     newLengthToSearch--;
 
     if (newIndexOf === -1) {
-      return { indexOf, length: newLengthToSearch };
+      return { indexOf, length: newLengthToSearch, partialSearchLevel };
     }
 
-    return binaryPartialSearch(text, search, newLengthToSearch + 1);
+    return binaryPartialSearch(
+      text,
+      search,
+      newLengthToSearch + 1,
+      partialSearchLevel,
+    );
   }
 
   if (lengthToSearch === 1) {
-    return { indexOf: -1, length: 0 };
+    return { indexOf: -1, length: 0, partialSearchLevel };
   }
 
-  return binaryPartialSearch(text, search, Math.ceil(lengthToSearch / 2));
+  return binaryPartialSearch(
+    text,
+    search,
+    Math.ceil(lengthToSearch / 2),
+    partialSearchLevel,
+  );
 }
 
 module.exports = function binaryIndexOf(text, search, needsCleanSearch) {
@@ -42,8 +53,8 @@ module.exports = function binaryIndexOf(text, search, needsCleanSearch) {
   let indexOf = text.indexOf(cleanedSearch);
   if (indexOf === -1) {
     const lengthToSearch = Math.ceil(search.length / 2);
-    return binaryPartialSearch(text, search, lengthToSearch);
+    return binaryPartialSearch(text, search, lengthToSearch, 0);
   }
 
-  return { indexOf, length: search.length };
+  return { indexOf, length: search.length, partialSearchLevel: 0 };
 };
