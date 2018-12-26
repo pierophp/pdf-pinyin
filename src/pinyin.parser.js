@@ -3,6 +3,7 @@ const { appendFile } = require('fs-extra');
 const replaceall = require('replaceall');
 const normalizeSearch = require('./normalize.search');
 const removeSpaces = require('./remove.spaces');
+const binaryIndexOf = require('./binary.index.of');
 
 async function importPinyin(pdfResultParsed, line, indexOf, isFounded) {
   let index = indexOf;
@@ -20,7 +21,7 @@ async function importPinyin(pdfResultParsed, line, indexOf, isFounded) {
       }
 
       result[resultItem].c.push(line[lineIndex]);
-      result[resultItem].p.push('');
+      result[resultItem].p.push(' ');
       result[resultItem].notFound = true;
 
       continue;
@@ -43,7 +44,7 @@ async function importPinyin(pdfResultParsed, line, indexOf, isFounded) {
         result[resultItem].p = [];
       }
       result[resultItem].c.push(mapItem.char);
-      result[resultItem].p.push(mapItem.pinyin ? mapItem.pinyin : '');
+      result[resultItem].p.push(mapItem.pinyin ? mapItem.pinyin : ' ');
 
       index++;
 
@@ -59,7 +60,7 @@ async function importPinyin(pdfResultParsed, line, indexOf, isFounded) {
     }
 
     result[resultItem].c.push(line[lineIndex]);
-    result[resultItem].p.push('');
+    result[resultItem].p.push(' ');
     result[resultItem].notFound = true;
 
     index++;
@@ -146,14 +147,12 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
     let indexOf = -1;
 
     let whileContinue = true;
-    let notFoundYet = '';
-    let notFoundYetSearch = '';
 
     let numberOfLoops = 0;
     let maxNumberOfLoops = 10000;
 
-    const regexFottnote = /^\^\d+段/;
-    const regexResult = line.match(regexFottnote);
+    const regexFootnote = /^\^\d+段/;
+    const regexResult = line.match(regexFootnote);
     if (regexResult) {
       returnLine = returnLine.concat(
         await importPinyin(pdfResultParsed, regexResult[0], indexOf, false),
@@ -173,63 +172,42 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
         whileContinue = false;
       }
 
-      let lineSearchClean = lineSearch;
-      if (hasAsterisk) {
-        lineSearchClean = replaceall('*', '', lineSearch);
-      }
+      const binaryIndexOfResult = binaryIndexOf(
+        pdfResultParsed.ideograms,
+        lineSearch,
+        hasAsterisk,
+      );
 
-      indexOf = pdfResultParsed.ideograms.indexOf(lineSearchClean);
+      if (binaryIndexOfResult.indexOf >= 0) {
+        const foundLine = line.substr(0, binaryIndexOfResult.length);
 
-      if (indexOf >= 0) {
         returnLine = returnLine.concat(
-          await importPinyin(pdfResultParsed, line, indexOf, true),
+          await importPinyin(
+            pdfResultParsed,
+            foundLine,
+            binaryIndexOfResult.indexOf,
+            true,
+          ),
         );
+
+        line = line.substr(binaryIndexOfResult.length);
+        if (!line) {
+          whileContinue = false;
+        }
 
         if (numberOfLoops > 1) {
           debug(
             `FOUND AT ${numberOfLoops} - ${line} ORIGINAL: ${originalLine}`,
           );
         }
-
-        indexOf = -1;
-
-        if (notFoundYet) {
-          line = notFoundYet.trim();
-          notFoundYet = '';
-
-          lineSearch = notFoundYetSearch.trim();
-          notFoundYetSearch = '';
-        } else {
-          whileContinue = false;
-        }
       } else {
-        notFoundYet = line.substr(-1) + notFoundYet;
+        returnLine = returnLine.concat(
+          await importPinyin(pdfResultParsed, line.substr(0, 1), -1, false),
+        );
+        debug(`NOT FOUND AT ${numberOfLoops} - ${line}`);
         line = line.substr(0, line.length - 1);
-
-        notFoundYetSearch = lineSearch.substr(-1) + notFoundYetSearch;
-        lineSearch = lineSearch.substr(0, lineSearch.length - 1);
-
         if (!line) {
-          if (notFoundYet) {
-            returnLine = returnLine.concat(
-              await importPinyin(
-                pdfResultParsed,
-                notFoundYet.substr(0, 1),
-                indexOf,
-                false,
-              ),
-            );
-
-            debug(`NOT FOUND AT ${numberOfLoops} - ${line}`);
-
-            line = notFoundYet.substr(1);
-            notFoundYet = '';
-
-            lineSearch = notFoundYetSearch.substr(1);
-            notFoundYetSearch = '';
-          } else {
-            whileContinue = false;
-          }
+          whileContinue = false;
         }
       }
     }
