@@ -1,6 +1,6 @@
 // @ts-check
 const { stat, mkdir, writeFile } = require('fs-extra');
-const axios = require('axios');
+const axios = require('axios').default;
 
 const { exec } = require('child-process-async');
 

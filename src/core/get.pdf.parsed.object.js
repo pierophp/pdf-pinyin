@@ -25,9 +25,9 @@ async function verifyLock(lockFile) {
     if (loop === 0) {
       return false;
     }
-
-    return true;
   }
+
+  return true;
 }
 
 module.exports = async function getPdfParsedObject(fullFilename, useLock) {

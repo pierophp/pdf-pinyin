@@ -24,7 +24,6 @@ function separate(pinyin) {
 
 module.exports = function separatePinyinInSyllables(pinyin, separateBySpaces) {
   if (!pinyin) {
-    p;
     return [];
   }
 
