@@ -36,7 +36,7 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
       let whileContinue = true;
 
       let numberOfLoops = 0;
-      let maxNumberOfLoops = 10000;
+      let maxNumberOfLoops = 3000;
 
       const regexFootnote = /^\^\d+段/;
       const regexResult = line.match(regexFootnote);
@@ -78,6 +78,7 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
           );
 
           line = line.substr(binaryIndexOfResult.length);
+          lineSearch = lineSearch.substr(binaryIndexOfResult.length);
           if (!line) {
             whileContinue = false;
           }
