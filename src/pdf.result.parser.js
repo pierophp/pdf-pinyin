@@ -1,8 +1,9 @@
 // @ts-check
 const replaceall = require('replaceall');
 const isChinese = require('./is.chinese');
-const separatePinyinInSyllables = require('./separate-pinyin-in-syllables');
+const normalizeSearch = require('./normalize.search');
 const removeSpaces = require('./remove.spaces');
+const separatePinyinInSyllables = require('./separate-pinyin-in-syllables');
 
 let map = {};
 let mapIndex = 0;
@@ -108,7 +109,7 @@ module.exports = async function pdfResultParser(content) {
   }
 
   return {
-    ideograms,
+    ideograms: await normalizeSearch(ideograms),
     map,
   };
 };
