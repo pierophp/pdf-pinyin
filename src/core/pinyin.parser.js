@@ -48,6 +48,7 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
         line = line.substr(regexResult[0].length);
         lineSearch = lineSearch.substr(regexResult[0].length);
       }
+
       let hasAsterisk = false;
       if (line.indexOf('*') >= 0) {
         hasAsterisk = true;
@@ -100,6 +101,7 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
             } LOOP ${numberOfLoops} - ${line}`,
           );
           line = line.substr(0, line.length - 1);
+          lineSearch = lineSearch.substr(0, lineSearch.length - 1);
           if (!line) {
             whileContinue = false;
           }
