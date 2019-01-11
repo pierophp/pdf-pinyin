@@ -1,44 +1,59 @@
 module.exports = function fillBoldItalic(originalLine, returnLine) {
-  let elementIndex = -1;
+  // let elementIndex = -1;
   let isBold = false;
   let isItalic = false;
-  for (const item of returnLine) {
-    for (const character of item.c) {
-      elementIndex++;
 
-      if (originalLine[elementIndex] === character) {
-        if (isBold) {
-          item.isBold = true;
-        }
-
-        if (isItalic) {
-          item.isItalic = true;
-        }
-        continue;
-      }
-
-      if (originalLine.substr(elementIndex, 3) === '<b>') {
-        isBold = true;
-        item.isBold = true;
-        elementIndex += 3;
-      }
-
-      if (originalLine.substr(elementIndex, 4) === '</b>') {
-        isBold = false;
-        elementIndex += 4;
-      }
-
-      if (originalLine.substr(elementIndex, 3) === '<i>') {
-        isItalic = true;
-        item.isItalic = true;
-        elementIndex += 3;
-      }
-
-      if (originalLine.substr(elementIndex, 4) === '</i>') {
-        isItalic = false;
-        elementIndex += 4;
-      }
+  let originalLineCounter = 0;
+  let returnLineCounter = 0;
+  let characterCounter = 0;
+  while (originalLineCounter < originalLine.length) {
+    if (returnLineCounter >= returnLine.length) {
+      break;
     }
+
+    if (originalLine.substr(originalLineCounter, 3) === '<b>') {
+      isBold = true;
+      originalLineCounter += 3;
+      continue;
+    }
+
+    if (originalLine.substr(originalLineCounter, 4) === '</b>') {
+      isBold = false;
+      originalLineCounter += 4;
+      continue;
+    }
+
+    if (originalLine.substr(originalLineCounter, 3) === '<i>') {
+      isItalic = true;
+      originalLineCounter += 3;
+      continue;
+    }
+
+    if (originalLine.substr(originalLineCounter, 4) === '</i>') {
+      isItalic = false;
+      originalLineCounter += 4;
+      continue;
+    }
+
+    const character = returnLine[returnLineCounter].c[characterCounter];
+
+    if (originalLine[originalLineCounter] === character) {
+      if (isBold) {
+        returnLine[returnLineCounter].isBold = true;
+      }
+
+      if (isItalic) {
+        returnLine[returnLineCounter].isItalic = true;
+      }
+      characterCounter++;
+    }
+
+    if (characterCounter === returnLine[returnLineCounter].c.length) {
+      characterCounter = 0;
+      returnLineCounter++;
+    }
+
+    originalLineCounter++;
   }
 
   return returnLine;
