@@ -77,7 +77,9 @@ function backHtmlTags(returnLine, lineWithTags) {
       returnLine[returnLineCounter].p[returnLineIdeogramCounter];
 
     if (returnLineIdeogram === lineWithTags[lineWithTagsCounter]) {
+      // @ts-ignore
       newReturnLine[newReturnLineCounter].c.push(returnLineIdeogram);
+      // @ts-ignore
       newReturnLine[newReturnLineCounter].p.push(returnLinePinyin);
 
       returnLineIdeogramCounter++;
