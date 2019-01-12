@@ -1,65 +1,7 @@
 // @ts-check
 const pinyinParser = require('../src/core/pinyin.parser');
-
-const resultParser01 = {
-  ideograms: '我們是一個巴西人啊',
-  map: {
-    '0': {
-      char: '我',
-      pinyin: 'Wǒ',
-      isChinese: false,
-      beginWord: true,
-    },
-    '1': {
-      char: '們',
-      pinyin: 'men',
-      isChinese: true,
-      beginWord: false,
-    },
-    '2': {
-      char: '是',
-      pinyin: 'shì',
-      isChinese: true,
-      beginWord: true,
-    },
-    '3': {
-      char: '一',
-      pinyin: 'yī',
-      isChinese: true,
-      beginWord: true,
-    },
-    '4': {
-      char: '個',
-      pinyin: 'gè',
-      isChinese: true,
-      beginWord: true,
-    },
-    '5': {
-      char: '巴',
-      pinyin: 'Bā',
-      isChinese: true,
-      beginWord: true,
-    },
-    '6': {
-      char: '西',
-      pinyin: 'xī',
-      isChinese: true,
-      beginWord: false,
-    },
-    '7': {
-      char: '人',
-      pinyin: 'rén',
-      isChinese: true,
-      beginWord: false,
-    },
-    '8': {
-      char: '啊',
-      pinyin: 'a',
-      isChinese: true,
-      beginWord: true,
-    },
-  },
-};
+const resultParser01 = require('./data/result.parser.01');
+const resultParser02 = require('./data/result.parser.02');
 
 test('Pinyin Parser ', async () => {
   const result = await pinyinParser(resultParser01, [
@@ -146,6 +88,114 @@ test('Pinyin Parser 3', async () => {
         p: ['a'],
         tagsStart: '<span>',
         tagsEnd: '</span></div>',
+      },
+    ],
+  ];
+
+  expect(JSON.stringify(result.lines, null, 2)).toBe(
+    JSON.stringify(expected, null, 2),
+  );
+});
+
+test('Pinyin Parser 4', async () => {
+  const result = await pinyinParser(resultParser02, [
+    `耶和华仁慈地请我们将内心所有的感受都告诉他。（<bible text=\"19:50:15\">诗篇50:15；</bible><bible text=\"19:62:8\">62:8</bible>）<bible text=\"20:3:5\">箴言3:5</bible>劝勉我们`,
+  ]);
+
+  const expected = [
+    [
+      {
+        c: ['耶', '和', '华'],
+        p: ['Yē', 'hé', 'huá'],
+      },
+      {
+        c: ['仁', '慈'],
+        p: ['rén', 'cí'],
+      },
+      {
+        c: ['地'],
+        p: ['de'],
+      },
+      {
+        c: ['请'],
+        p: ['qǐng'],
+      },
+      {
+        c: ['我', '们'],
+        p: ['wǒ', 'men'],
+      },
+      {
+        c: ['将'],
+        p: ['jiāng'],
+      },
+      {
+        c: ['内', '心'],
+        p: ['nèi', 'xīn'],
+      },
+      {
+        c: ['所', '有'],
+        p: ['suǒ', 'yǒu'],
+      },
+      {
+        c: ['的'],
+        p: ['de'],
+      },
+      {
+        c: ['感', '受'],
+        p: ['gǎn', 'shòu'],
+      },
+      {
+        c: ['都'],
+        p: ['dōu'],
+      },
+      {
+        c: ['告', '诉'],
+        p: ['gào', 'su'],
+      },
+      {
+        c: ['他'],
+        p: ['tā'],
+      },
+      {
+        c: ['。', '（'],
+        p: [' ', ' '],
+      },
+      {
+        c: ['诗', '篇'],
+        p: ['Shī', 'piān'],
+        tagsStart: '<bible text="19:50:15">',
+      },
+      {
+        c: ['5', '0', ':', '1', '5', '；'],
+        p: [' ', ' ', ' ', ' ', ' ', ' '],
+      },
+      {
+        c: ['6', '2', ':', '8'],
+        p: [' ', ' ', ' ', ' '],
+        tagsStart: '</bible><bible text="19:62:8">',
+      },
+      {
+        c: ['）'],
+        p: [' '],
+        tagsStart: '</bible>',
+      },
+      {
+        c: ['箴', '言'],
+        p: ['Zhēn', 'yán'],
+        tagsStart: '<bible text="20:3:5">',
+      },
+      {
+        c: ['3', ':', '5'],
+        p: [' ', ' ', ' '],
+      },
+      {
+        c: ['劝', '勉'],
+        p: ['quàn', 'miǎn'],
+        tagsStart: '</bible>',
+      },
+      {
+        c: ['我', '们'],
+        p: ['wǒ', 'men'],
       },
     ],
   ];
