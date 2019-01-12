@@ -9,7 +9,7 @@ module.exports = async function importPinyin(
   const result = [];
   let resultItem = -1;
   for (let lineIndex = 0; lineIndex < line.length; lineIndex++) {
-    if (line.substr(lineIndex, 1) === '*') {
+    if (line[lineIndex] === '*') {
       resultItem++;
 
       if (!result[resultItem]) {
@@ -41,7 +41,7 @@ module.exports = async function importPinyin(
         result[resultItem].c = [];
         result[resultItem].p = [];
       }
-      result[resultItem].c.push(mapItem.char);
+      result[resultItem].c.push(line[lineIndex]);
       result[resultItem].p.push(mapItem.pinyin ? mapItem.pinyin : ' ');
 
       index++;

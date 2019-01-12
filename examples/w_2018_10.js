@@ -15,7 +15,7 @@ const lines = [
 
   let ideograms = '';
   let pinyin = '';
-  for (const block of result[0]) {
+  for (const block of result.lines[0]) {
     ideograms += block.c.join('') + ' ';
     pinyin += block.p.join('') + ' ';
   }
