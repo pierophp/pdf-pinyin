@@ -2,6 +2,8 @@
   "name": "pdf-pinyin",
   "version": "1.0.0",
   "main": "index.js",
+  "repository": "git@github.com:pierophp/pdf-pinyin.git",
+  "author": "Piero Giusti <pierophp@gmail.com>",
   "license": "MIT",
   "scripts": {
     "test": "jest",
@@ -22,5 +24,12 @@
   "devDependencies": {
     "jest": "^23.6.0",
     "prettier": "^1.15.3"
+  },
+  "keywords": [
+    "pdf",
+    "pinyin"
+  ],
+  "engines": {
+    "node": ">=8.0"
   }
 }
