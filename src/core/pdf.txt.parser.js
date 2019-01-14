@@ -86,7 +86,15 @@ module.exports = async function pdfTxtParser(content) {
 
       tmpCharacter = line;
     } else {
-      tmpPinyin = replaceall(' ', '', line);
+      const pinyinSeparated = line.split(' ');
+      const pinyinSyllableWithOneLetter = pinyinSeparated.find(
+        item => item.length === 1,
+      );
+
+      tmpPinyin = line;
+      if (pinyinSyllableWithOneLetter) {
+        tmpPinyin = pinyinSeparated.join('');
+      }
 
       if (!tmpPinyin) {
         tmpCharacter = null;

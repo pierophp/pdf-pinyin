@@ -1,28 +1,28 @@
 // @ts-check
 
-const vowels = 'aāáǎàeēéěèiīíǐìoōóǒòuūúǔùüǖǘǚǜ';
+const vowels = 'aeiou';
 const tones = 'āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ';
+
+/**
+ *
+ * Based on http://pinyin.info/news/2008/separating-pinyin-syllables-php-code/
+ */
+
 function separate(pinyin) {
-  return (
-    pinyin
-      .replace(new RegExp(`([${vowels}])([^${vowels}nr])`, 'gi'), '$1 $2') // This line does most of the work
-      .replace(new RegExp('(w)([csz]h)', 'i'), '$1 $2') // double-consonant initials
-      .replace(new RegExp(`(n)([^${vowels}vg])`, 'i'), '$1 $2') // cleans up most n compounds
-      .replace(
-        new RegExp(
-          '([' + vowels + 'v])([^' + vowels + 'ws])([' + vowels + 'v])',
-          'i',
-        ),
-        '$1 $2$3',
-      ) // assumes correct Pinyin (i.e., no missing apostrophes)
-      .replace(
-        new RegExp('([' + vowels + 'v])(n)(g)([' + vowels + 'v])', 'i'),
-        '$1$2 $3$4',
-      ) // assumes correct Pinyin, i.e. changan = chan + gan
-      .replace(new RegExp('([gr])([^' + vowels + '])', 'i'), '$1 $2') // fixes -ng and -r finals not followed by vowels
-      //.replace(new RegExp('([^e\w\s])(r)'), '$1 $2'); // r an initial, except in er
-      .replace(/\s{2,}/g, ' ') // remove double-spaces
-  );
+  return pinyin
+    .replace(new RegExp(`([${vowels}])([^${vowels}nr\W\s])`, 'gi'), '$1 $2') // This line does most of the work
+    .replace(new RegExp(`(\w)([csz]h)`, 'i'), '$1 $2') // double-consonant initials
+    .replace(new RegExp(`(n)([^${vowels}vg\W\s])`, 'i'), '$1 $2') // cleans up most n compounds
+    .replace(
+      new RegExp(`([${vowels}v])([^${vowels}\W\s])([${vowels}v])`, 'i'),
+      '$1 $2$3',
+    ) // assumes correct Pinyin (i.e., no missing apostrophes)
+    .replace(
+      new RegExp('([' + vowels + 'v])(n)(g)([' + vowels + 'v])', 'i'),
+      '$1$2 $3$4',
+    ) // assumes correct Pinyin, i.e. changan = chan + gan
+    .replace(new RegExp(`([gr])([^${vowels}\W\s])`, 'i'), '$1 $2') // fixes -ng and -r finals not followed by vowels
+    .replace(new RegExp(`([^e\W\s])(r)`, 'i'), '$1 $2'); // r an initial, except in er
 }
 
 module.exports = function separatePinyinInSyllables(pinyin, separateBySpaces) {

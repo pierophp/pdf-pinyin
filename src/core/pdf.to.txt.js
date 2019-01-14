@@ -1,5 +1,5 @@
 // @ts-check
-const { stat, mkdir, writeFile } = require('fs-extra');
+const { stat, mkdir, readFile, writeFile, remove } = require('fs-extra');
 const axios = require('axios').default;
 
 const { exec } = require('child-process-async');
@@ -40,6 +40,24 @@ async function extractFile(filename, filenameTxt) {
 
 module.exports = async function pdfToTxt(fullFilename, filename, filenameTxt) {
   await createParentFolder();
-  await downloadFile(fullFilename, filename);
-  await extractFile(filename, filenameTxt);
+
+  const fullFilenameList = fullFilename.split('|||');
+  let i = 0;
+  let contentPdf = ``;
+
+  for (const fullFilenameItem of fullFilenameList) {
+    const filenameItem = `${filename}_${i}`;
+    const filenameTxtItem = `${filenameTxt}_${i}`;
+
+    await downloadFile(fullFilenameItem, filenameItem);
+    await extractFile(filenameItem, filenameTxtItem);
+
+    contentPdf += (await readFile(filenameTxtItem)).toString();
+
+    await remove(filenameItem);
+    await remove(filenameTxtItem);
+    i++;
+  }
+
+  await writeFile(filenameTxt, contentPdf);
 };

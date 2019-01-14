@@ -1,6 +1,6 @@
 // @ts-check
 
-const pdfToText = require('./pdf.to.txt');
+const pdfToTxt = require('./pdf.to.txt');
 const pdfTxtParser = require('./pdf.txt.parser');
 const { stat, writeFile, readFile, remove } = require('fs-extra');
 
@@ -31,8 +31,14 @@ async function verifyLock(lockFile) {
 }
 
 module.exports = async function getPdfParsedObject(fullFilename, useLock) {
-  const fullFilenameSplit = fullFilename.split('/');
-  const filenameRelative = fullFilenameSplit[fullFilenameSplit.length - 1];
+  const fullFilenameList = fullFilename.split('|||');
+  const filenameRelativeList = [];
+  for (const fullFilenameItem of fullFilenameList) {
+    const fullFilenameSplit = fullFilenameItem.split('/');
+    filenameRelativeList.push(fullFilenameSplit[fullFilenameSplit.length - 1]);
+  }
+
+  const filenameRelative = filenameRelativeList.join('_');
 
   const filename = `${__dirname}/../../data/${filenameRelative}`;
 
@@ -40,8 +46,6 @@ module.exports = async function getPdfParsedObject(fullFilename, useLock) {
   const filenameParsed = `${filename}.parsed.json`;
 
   let resultString = '{}';
-
-  await pdfToText(fullFilename, filename, filenameTxt);
 
   try {
     await stat(filenameParsed);
@@ -56,6 +60,8 @@ module.exports = async function getPdfParsedObject(fullFilename, useLock) {
     }
 
     if (!lockResult) {
+      await pdfToTxt(fullFilename, filename, filenameTxt);
+
       await writeFile(lockFile, Date.now());
 
       const content = (await readFile(filenameTxt)).toString();
