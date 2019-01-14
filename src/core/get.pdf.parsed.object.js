@@ -60,10 +60,6 @@ module.exports = async function getPdfParsedObject(fullFilename, useLock) {
   let resultString = '{}';
 
   try {
-    if (1 === 1) {
-      throw new Error('NO CACHE');
-    }
-
     await stat(filenameParsed);
 
     resultString = (await readFile(filenameParsed)).toString();
