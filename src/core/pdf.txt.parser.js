@@ -57,6 +57,18 @@ module.exports = async function pdfTxtParser(content) {
 
   const lines = content.split('\n').filter(item => item);
 
+  const first10Lines = lines.slice(0, 10);
+  const isChineseVerificationFirstLines = isChinese(
+    first10Lines.join(''),
+    true,
+  );
+
+  if (!isChineseVerificationFirstLines.isChinese) {
+    return {
+      isReadable: false,
+    };
+  }
+
   map = {};
   mapIndex = 0;
 
@@ -117,6 +129,7 @@ module.exports = async function pdfTxtParser(content) {
   }
 
   return {
+    isReadable: true,
     ideograms: await normalizeSearch(ideograms),
     map,
   };

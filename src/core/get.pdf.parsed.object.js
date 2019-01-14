@@ -4,6 +4,18 @@ const pdfToTxt = require('./pdf.to.txt');
 const pdfTxtParser = require('./pdf.txt.parser');
 const { stat, writeFile, readFile, remove } = require('fs-extra');
 
+function getLockFilename(filename) {
+  const now = new Date();
+  const lockSuffix = `${now.getFullYear()}${(now.getMonth() + 1)
+    .toString()
+    .padStart(2, '0')}${now
+    .getDay()
+    .toString()
+    .padStart(2, '0')}`;
+
+  return `${filename}${lockSuffix}.lock`;
+}
+
 /*
  * @todo Improve Lock
  */
@@ -48,11 +60,15 @@ module.exports = async function getPdfParsedObject(fullFilename, useLock) {
   let resultString = '{}';
 
   try {
+    if (1 === 1) {
+      throw new Error('NO CACHE');
+    }
+
     await stat(filenameParsed);
 
     resultString = (await readFile(filenameParsed)).toString();
   } catch (e) {
-    const lockFile = filenameParsed + '.lock';
+    const lockFile = getLockFilename(filenameParsed);
     let lockResult = false;
 
     if (useLock) {
@@ -60,13 +76,14 @@ module.exports = async function getPdfParsedObject(fullFilename, useLock) {
     }
 
     if (!lockResult) {
-      await pdfToTxt(fullFilename, filename, filenameTxt);
-
       await writeFile(lockFile, Date.now());
+
+      await pdfToTxt(fullFilename, filename, filenameTxt);
 
       const content = (await readFile(filenameTxt)).toString();
 
       resultString = JSON.stringify(await pdfTxtParser(content), null, 2);
+
       await writeFile(filenameParsed, resultString);
 
       await remove(lockFile);

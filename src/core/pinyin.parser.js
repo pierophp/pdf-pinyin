@@ -51,6 +51,12 @@ function verifyHasBoldOrItalic(text) {
 module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
   const maxNumberOfLoops = 3000;
 
+  if (!pdfResultParsed.isReadable) {
+    return {
+      isReadable: false,
+    };
+  }
+
   const returnLines = await bluebird.map(
     lines,
     async (originalLine, i) => {
@@ -155,5 +161,9 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
     },
   );
 
-  return { lines: returnLines, text: generateHtml(returnLines) };
+  return {
+    isReadable: true,
+    lines: returnLines,
+    text: generateHtml(returnLines),
+  };
 };
