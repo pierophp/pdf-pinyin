@@ -1,5 +1,8 @@
 // @ts-check
 const replaceall = require('replaceall');
+const TradOrSimp = require('traditional-or-simplified');
+const { traditionalToSimplified } = require('node-opencc');
+
 const isChinese = require('../helpers/is.chinese');
 const normalizeSearch = require('../helpers/normalize.search');
 const removeSpaces = require('../helpers/remove.spaces');
@@ -8,7 +11,7 @@ const separatePinyinInSyllables = require('../helpers/separate-pinyin-in-syllabl
 let map = {};
 let mapIndex = 0;
 
-async function parseCharacter(tmpCharacter, tmpPinyin) {
+async function parseCharacter(tmpCharacter, tmpPinyin, tmpTraditional) {
   let pinyinIndex = 0;
   let beginWord = true;
   let currentType = '';
@@ -31,6 +34,11 @@ async function parseCharacter(tmpCharacter, tmpPinyin) {
         isChinese: true,
         beginWord,
       };
+
+      if (tmpTraditional) {
+        map[mapIndex].charT = tmpTraditional[charIndex];
+      }
+
       pinyinIndex++;
       beginWord = false;
       mapIndex++;
@@ -45,6 +53,11 @@ async function parseCharacter(tmpCharacter, tmpPinyin) {
         isChinese: false,
         beginWord,
       };
+
+      if (tmpTraditional) {
+        map[mapIndex].charT = tmpTraditional[charIndex];
+      }
+
       beginWord = false;
       mapIndex++;
       currentType = 'special';
@@ -54,12 +67,13 @@ async function parseCharacter(tmpCharacter, tmpPinyin) {
 
 module.exports = async function pdfTxtParser(content) {
   let ideograms = '';
+  let ideogramsT = '';
 
   const lines = content.split('\n').filter(item => item);
 
-  const first10Lines = lines.slice(0, 10);
+  const first20Lines = lines.slice(0, 20);
   const isChineseVerificationFirstLines = isChinese(
-    first10Lines.join(''),
+    first20Lines.join(''),
     true,
   );
 
@@ -68,6 +82,8 @@ module.exports = async function pdfTxtParser(content) {
       isReadable: false,
     };
   }
+
+  const isTraditional = TradOrSimp.isTraditional(first20Lines.join(''));
 
   map = {};
   mapIndex = 0;
@@ -85,15 +101,37 @@ module.exports = async function pdfTxtParser(content) {
     if (isChineseVerification.isChinese) {
       if (isChineseVerification.type === 'special') {
         line = removeSpaces(line);
-        await parseCharacter(line, null);
+
+        let traditionalLine = null;
+        if (isTraditional) {
+          traditionalLine = line;
+          line = traditionalToSimplified(line);
+        }
+
+        await parseCharacter(line, null, traditionalLine);
         ideograms += line;
+        if (isTraditional) {
+          ideogramsT += traditionalLine;
+        }
+
         continue;
       }
 
       if (tmpCharacter) {
         tmpCharacter = removeSpaces(tmpCharacter);
-        await parseCharacter(tmpCharacter, null);
+
+        let traditionalLine = null;
+        if (isTraditional) {
+          traditionalLine = tmpCharacter;
+          tmpCharacter = traditionalToSimplified(tmpCharacter);
+        }
+
+        await parseCharacter(tmpCharacter, null, traditionalLine);
+
         ideograms += tmpCharacter;
+        if (isTraditional) {
+          ideogramsT += traditionalLine;
+        }
       }
 
       tmpCharacter = line;
@@ -121,16 +159,33 @@ module.exports = async function pdfTxtParser(content) {
         continue;
       }
 
-      await parseCharacter(tmpCharacter, tmpPinyin);
+      let traditionalLine = null;
+      if (isTraditional) {
+        traditionalLine = tmpCharacter;
+        tmpCharacter = traditionalToSimplified(tmpCharacter);
+      }
+
+      await parseCharacter(tmpCharacter, tmpPinyin, traditionalLine);
+
       ideograms += tmpCharacter;
+
+      if (isTraditional) {
+        ideogramsT += traditionalLine;
+      }
 
       tmpCharacter = null;
     }
   }
 
-  return {
-    isReadable: true,
-    ideograms: await normalizeSearch(ideograms),
-    map,
-  };
+  const response = {};
+  response.isReadable = true;
+  response.ideograms = await normalizeSearch(ideograms);
+
+  if (ideogramsT) {
+    response.ideogramsT = await normalizeSearch(ideogramsT);
+  }
+
+  response.map = map;
+
+  return response;
 };

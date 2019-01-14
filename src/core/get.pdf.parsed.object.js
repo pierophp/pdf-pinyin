@@ -60,6 +60,10 @@ module.exports = async function getPdfParsedObject(fullFilename, useLock) {
   let resultString = '{}';
 
   try {
+    if (parseInt(process.env.NO_CACHE, 10)) {
+      throw new Error('CACHE DISABLED');
+    }
+
     await stat(filenameParsed);
 
     resultString = (await readFile(filenameParsed)).toString();
@@ -78,7 +82,11 @@ module.exports = async function getPdfParsedObject(fullFilename, useLock) {
 
       const content = (await readFile(filenameTxt)).toString();
 
-      resultString = JSON.stringify(await pdfTxtParser(content), null, 2);
+      resultString = JSON.stringify(
+        await pdfTxtParser(content),
+        null,
+        process.env.DEBUG_LOG ? 2 : 0,
+      );
 
       await writeFile(filenameParsed, resultString);
 

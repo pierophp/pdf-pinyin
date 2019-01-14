@@ -2092,6 +2092,10 @@ node-notifier@^5.2.1:
     shellwords "^0.1.1"
     which "^1.3.0"
 
+node-opencc@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/node-opencc/-/node-opencc-2.0.1.tgz#8d53ab05907922ab632615886f24b4aca7567f85"
+
 node-pre-gyp@^0.10.0:
   version "0.10.3"
   resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.10.3.tgz#3070040716afdc778747b61b6887bf78880b80fc"

@@ -14,5 +14,8 @@ const { readFile, writeFile } = require('fs-extra');
 
   const returnLines = await pdfPinyin(process.argv[2], lines);
 
-  await writeFile(filenameToReturn, JSON.stringify(returnLines, null, 2));
+  await writeFile(
+    filenameToReturn,
+    JSON.stringify(returnLines, null, process.env.DEBUG_LOG ? 2 : 0),
+  );
 })();
