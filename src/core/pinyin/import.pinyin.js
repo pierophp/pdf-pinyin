@@ -1,3 +1,5 @@
+const pinyinConverter = require('pinyin');
+
 module.exports = async function importPinyin(
   pdfResultParsed,
   line,
@@ -58,7 +60,7 @@ module.exports = async function importPinyin(
     }
 
     result[resultItem].c.push(line[lineIndex]);
-    result[resultItem].p.push(' ');
+    result[resultItem].p.push(pinyinConverter(line[lineIndex]).join(''));
     result[resultItem].notFound = true;
 
     index++;
