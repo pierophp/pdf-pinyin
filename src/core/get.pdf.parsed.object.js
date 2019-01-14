@@ -42,7 +42,11 @@ async function verifyLock(lockFile) {
   return true;
 }
 
-module.exports = async function getPdfParsedObject(fullFilename, useLock) {
+module.exports = async function getPdfParsedObject(
+  fullFilename,
+  useLock,
+  options,
+) {
   const fullFilenameList = fullFilename.split('|||');
   const filenameRelativeList = [];
   for (const fullFilenameItem of fullFilenameList) {
@@ -50,9 +54,14 @@ module.exports = async function getPdfParsedObject(fullFilename, useLock) {
     filenameRelativeList.push(fullFilenameSplit[fullFilenameSplit.length - 1]);
   }
 
+  let baseDir = `${__dirname}/../../data`;
+  if (options && options.dirname) {
+    baseDir = options.dirname;
+  }
+
   const filenameRelative = filenameRelativeList.join('_');
 
-  const filename = `${__dirname}/../../data/${filenameRelative}`;
+  const filename = `${baseDir}/${filenameRelative}`;
 
   const filenameTxt = `${filename}.txt`;
   const filenameParsed = `${filename}.parsed.json`;
