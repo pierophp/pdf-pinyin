@@ -92,6 +92,9 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
         hasAsterisk = true;
       }
 
+      let notFoundWaiting = '';
+      let notFoundWaitingSearch = '';
+
       while (whileContinue) {
         numberOfLoops++;
         if (numberOfLoops > maxNumberOfLoops) {
@@ -130,18 +133,34 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
             );
           }
         } else {
-          returnLine = returnLine.concat(
-            await importPinyin(pdfResultParsed, line.substr(0, 1), -1, false),
-          );
           debug(
             `NOT FOUND LEVEL ${
               binaryIndexOfResult.partialSearchLevel
             } LOOP ${numberOfLoops} - ${line}`,
           );
+
+          if (line.length > 1) {
+            notFoundWaiting = line.substr(line.length - 1) + notFoundWaiting;
+            notFoundWaitingSearch =
+              line.substr(lineSearch.length - 1) + notFoundWaitingSearch;
+          } else {
+            returnLine = returnLine.concat(
+              await importPinyin(pdfResultParsed, line.substr(0, 1), -1, false),
+            );
+          }
+
           line = line.substr(0, line.length - 1);
           lineSearch = lineSearch.substr(0, lineSearch.length - 1);
+
           if (!line) {
-            whileContinue = false;
+            if (notFoundWaiting) {
+              line = notFoundWaiting;
+              lineSearch = notFoundWaitingSearch;
+              notFoundWaiting = '';
+              notFoundWaitingSearch = '';
+            } else {
+              whileContinue = false;
+            }
           }
         }
       }
