@@ -60,7 +60,7 @@ module.exports = async function getPdfParsedObject(fullFilename, useLock) {
   let resultString = '{}';
 
   try {
-    if (parseInt(process.env.NO_CACHE, 10)) {
+    if (parseInt(process.env.NO_CACHE || '', 10)) {
       throw new Error('CACHE DISABLED');
     }
 
