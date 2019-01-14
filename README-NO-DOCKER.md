@@ -2,6 +2,20 @@
 
 The project goal is to extract the Pinyin from a PDF.
 
+To add to your project:
+
+YARN:
+
+```
+yarn add pdf-pinyin
+```
+
+NPM:
+
+```
+npm install pdf-pinyin
+```
+
 ## Dependencies
 
 ### pdftotext
