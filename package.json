@@ -5,7 +5,9 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "build": "rm -Rf dist/ && mkdir dist/ && mkdir dist/data && cp index.js dist/ && cp -R src dist",
+    "npm:publish": "yarn build && cp package.json dist/ && cd dist/ && npm publish"
   },
   "dependencies": {
     "axios": "^0.18.0",
