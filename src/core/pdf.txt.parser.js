@@ -71,19 +71,16 @@ module.exports = async function pdfTxtParser(content) {
 
   const lines = content.split('\n').filter(item => item);
 
-  const first20Lines = lines.slice(0, 20);
-  const isChineseVerificationFirstLines = isChinese(
-    first20Lines.join(''),
-    true,
-  );
+  const last20Lines = lines.slice(Math.max(lines.length - 5, 1));
+  const isChineseVerificationLastLines = isChinese(last20Lines.join(''), true);
 
-  if (!isChineseVerificationFirstLines.isChinese) {
+  if (!isChineseVerificationLastLines.isChinese) {
     return {
       isReadable: false,
     };
   }
 
-  const isTraditional = TradOrSimp.isTraditional(first20Lines.join(''));
+  const isTraditional = TradOrSimp.isTraditional(last20Lines.join(''));
 
   map = {};
   mapIndex = 0;
