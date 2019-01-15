@@ -1,3 +1,4 @@
+const isChinese = require('../../helpers/is.chinese');
 const pinyinConverter = require('pinyin');
 
 module.exports = async function importPinyin(
@@ -60,7 +61,18 @@ module.exports = async function importPinyin(
     }
 
     result[resultItem].c.push(line[lineIndex]);
-    result[resultItem].p.push(pinyinConverter(line[lineIndex]).join(''));
+
+    const isChineseVerification = isChinese(line[lineIndex], true);
+
+    if (
+      isChineseVerification.isChinese &&
+      isChineseVerification.type === 'ideograms'
+    ) {
+      result[resultItem].p.push(pinyinConverter(line[lineIndex]).join(''));
+    } else {
+      result[resultItem].p.push(' ');
+    }
+
     result[resultItem].notFound = true;
 
     index++;
