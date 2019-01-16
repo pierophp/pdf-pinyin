@@ -2,7 +2,15 @@
 
 const pdfToTxt = require('./pdf.to.txt');
 const pdfTxtParser = require('./pdf.txt.parser');
-const { stat, writeFile, readFile, remove } = require('fs-extra');
+const { stat, mkdir, writeFile, readFile, remove } = require('fs-extra');
+
+async function createParentFolder(folder) {
+  try {
+    await stat(folder);
+  } catch (e) {
+    await mkdir(folder);
+  }
+}
 
 function getLockFilename(filename) {
   const now = new Date();
@@ -58,6 +66,8 @@ module.exports = async function getPdfParsedObject(
   if (options && options.dirname) {
     baseDir = options.dirname;
   }
+
+  await createParentFolder(baseDir);
 
   const filenameRelative = filenameRelativeList.join('_');
 

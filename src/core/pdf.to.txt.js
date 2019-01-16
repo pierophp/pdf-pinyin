@@ -1,17 +1,8 @@
 // @ts-check
-const { stat, mkdir, readFile, writeFile, remove } = require('fs-extra');
+const { stat, readFile, writeFile, remove } = require('fs-extra');
 const axios = require('axios').default;
 
 const { exec } = require('child-process-async');
-
-async function createParentFolder() {
-  const folder = `${__dirname}/../../data`;
-  try {
-    await stat(folder);
-  } catch (e) {
-    await mkdir(folder);
-  }
-}
 
 async function downloadFile(fullFilename, filename) {
   try {
@@ -39,8 +30,6 @@ async function extractFile(filename, filenameTxt) {
 }
 
 module.exports = async function pdfToTxt(fullFilename, filename, filenameTxt) {
-  await createParentFolder();
-
   const fullFilenameList = fullFilename.split('|||');
   let i = 0;
   let contentPdf = ``;
