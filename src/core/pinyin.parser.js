@@ -51,7 +51,7 @@ function verifyHasBoldOrItalic(text) {
 module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
   const maxNumberOfLoops = 3000;
 
-  if (!pdfResultParsed && !pdfResultParsed.isReadable) {
+  if (!pdfResultParsed || !pdfResultParsed.isReadable) {
     return {
       isReadable: false,
     };
