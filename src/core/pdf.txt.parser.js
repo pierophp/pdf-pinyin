@@ -94,10 +94,12 @@ module.exports = async function pdfTxtParser(content) {
     line = replaceall('_', '', line);
     line = line.trim();
 
-    const isChineseVerification = isChinese(line, true);
+    const lineWithoutSpaces = removeSpaces(line);
+    const isChineseVerification = isChinese(lineWithoutSpaces, true);
+
     if (isChineseVerification.isChinese) {
       if (isChineseVerification.type === 'special') {
-        line = removeSpaces(line);
+        line = lineWithoutSpaces;
 
         let traditionalLine = null;
         if (isTraditional) {
@@ -115,7 +117,7 @@ module.exports = async function pdfTxtParser(content) {
       }
 
       if (tmpCharacter) {
-        tmpCharacter = removeSpaces(tmpCharacter);
+        tmpCharacter = lineWithoutSpaces;
 
         let traditionalLine = null;
         if (isTraditional) {

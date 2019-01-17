@@ -1,4 +1,5 @@
 module.exports = {
+  isReadable: true,
   ideograms: '我們是一個巴西人啊',
   map: {
     '0': {
