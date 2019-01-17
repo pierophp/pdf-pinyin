@@ -85,7 +85,9 @@ module.exports = async function getPdfParsedObject(
     }
 
     if (!lockResult) {
-      await writeFile(lockFile, Date.now());
+      if (useLock) {
+        await writeFile(lockFile, Date.now());
+      }
 
       await pdfToTxt(fullFilename, filename, filenameTxt);
 
@@ -99,7 +101,11 @@ module.exports = async function getPdfParsedObject(
 
       await writeFile(filenameParsed, resultString);
 
-      await remove(lockFile);
+      if (useLock) {
+        try {
+          await remove(lockFile);
+        } catch (e) {}
+      }
     } else {
       resultString = (await readFile(filenameParsed)).toString();
     }

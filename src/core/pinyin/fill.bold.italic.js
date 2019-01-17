@@ -1,5 +1,4 @@
 module.exports = function fillBoldItalic(originalLine, returnLine) {
-  // let elementIndex = -1;
   let isBold = false;
   let isItalic = false;
 
