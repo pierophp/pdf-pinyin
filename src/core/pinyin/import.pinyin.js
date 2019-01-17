@@ -45,7 +45,20 @@ module.exports = async function importPinyin(
         result[resultItem].p = [];
       }
       result[resultItem].c.push(line[lineIndex]);
-      result[resultItem].p.push(mapItem.pinyin ? mapItem.pinyin : ' ');
+      if (mapItem.pinyin) {
+        result[resultItem].p.push(mapItem.pinyin);
+      } else {
+        const isChineseVerification = isChinese(line[lineIndex], true);
+
+        if (
+          isChineseVerification.isChinese &&
+          isChineseVerification.type === 'ideograms'
+        ) {
+          result[resultItem].p.push(pinyinConverter(line[lineIndex]).join(''));
+        } else {
+          result[resultItem].p.push(' ');
+        }
+      }
 
       index++;
 
