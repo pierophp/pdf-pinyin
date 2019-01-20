@@ -111,6 +111,10 @@ module.exports = async function getPdfParsedObject(
 
       await writeFile(filenameParsed, resultString);
 
+      if (!process.env.DEBUG_LOG) {
+        await remove(filenameTxt);
+      }
+
       if (useLock) {
         try {
           await remove(lockFile);
