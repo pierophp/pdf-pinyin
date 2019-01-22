@@ -34,6 +34,11 @@ module.exports = function backHtmlTags(returnLine, lineWithTags) {
       // @ts-ignore
       newReturnLine[newReturnLineCounter].p.push(returnLinePinyin);
 
+      if (returnLine[returnLineCounter].notFound) {
+        // @ts-ignore
+        newReturnLine[newReturnLineCounter].notFound = true;
+      }
+
       returnLineIdeogramCounter++;
       if (
         returnLine[returnLineCounter].c.length <= returnLineIdeogramCounter &&
