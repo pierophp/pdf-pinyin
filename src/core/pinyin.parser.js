@@ -36,6 +36,21 @@ function generateHtml(lines) {
   return html;
 }
 
+function percentNotFound(lines) {
+  let totalNotFound = 0;
+  let totalChars = 0;
+  for (const line of lines) {
+    for (const block of line) {
+      totalChars += block.c.length;
+      if (block.notFound) {
+        totalNotFound++;
+      }
+    }
+  }
+
+  return (totalNotFound * 100) / totalChars;
+}
+
 function verifyHasBoldOrItalic(text) {
   if (text.indexOf('<b>') !== -1) {
     return true;
@@ -184,5 +199,6 @@ module.exports = async function pinyinParser(pdfResultParsed, lines = []) {
     isReadable: true,
     lines: returnLines,
     text: generateHtml(returnLines),
+    percentNotFound: percentNotFound(returnLines),
   };
 };
