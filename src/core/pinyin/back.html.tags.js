@@ -1,3 +1,5 @@
+const removeSpaces = require('../../helpers/remove.spaces');
+
 module.exports = function backHtmlTags(returnLine, lineWithTags) {
   let lineWithTagsCounter = 0;
 
@@ -27,6 +29,11 @@ module.exports = function backHtmlTags(returnLine, lineWithTags) {
 
     const returnLinePinyin =
       returnLine[returnLineCounter].p[returnLineIdeogramCounter];
+
+    if (!removeSpaces(lineWithTags[lineWithTagsCounter])) {
+      lineWithTagsCounter++;
+      continue;
+    }
 
     if (returnLineIdeogram === lineWithTags[lineWithTagsCounter] && !tagStart) {
       // @ts-ignore
