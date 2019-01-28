@@ -30,7 +30,7 @@ module.exports = function backHtmlTags(returnLine, lineWithTags) {
     const returnLinePinyin =
       returnLine[returnLineCounter].p[returnLineIdeogramCounter];
 
-    if (!removeSpaces(lineWithTags[lineWithTagsCounter])) {
+    if (!tagStart && !removeSpaces(lineWithTags[lineWithTagsCounter])) {
       lineWithTagsCounter++;
       continue;
     }
