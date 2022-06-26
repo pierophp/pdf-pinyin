@@ -24,11 +24,10 @@ module.exports = function backHtmlTags(returnLine, lineWithTags) {
       };
     }
 
-    const returnLineIdeogram =
-      returnLine[returnLineCounter].c[returnLineIdeogramCounter];
+  
+    const returnLineIdeogram = returnLine[returnLineCounter] ? returnLine[returnLineCounter].c[returnLineIdeogramCounter] : "";
 
-    const returnLinePinyin =
-      returnLine[returnLineCounter].p[returnLineIdeogramCounter];
+    const returnLinePinyin = returnLine[returnLineCounter] ? returnLine[returnLineCounter].p[returnLineIdeogramCounter] || '' : "";
 
     if (!tagStart && !removeSpaces(lineWithTags[lineWithTagsCounter])) {
       lineWithTagsCounter++;
